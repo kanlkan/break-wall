@@ -69,7 +69,6 @@ class FieldPanel(wx.Panel):
         self.Bind(wx.EVT_KEY_DOWN, self.onKey)
 
     def update(self):
-        #self.detStageClear()
         self.ball.move()
         self.Refresh()
     
@@ -77,19 +76,19 @@ class FieldPanel(wx.Panel):
         dc = wx.AutoBufferedPaintDC(self)
         dc.Clear()
         # Paint Bar
-        dc.SetPen(wx.Pen(self.bar.color, 1))
-        dc.SetBrush(wx.Brush(self.bar.color, 1))
+        dc.SetPen(wx.Pen(self.bar.color))
+        dc.SetBrush(wx.Brush(self.bar.color))
         dc.DrawRectangle(self.bar.x, self.bar.y, self.bar.size[0], self.bar.size[1])
         # Paint Ball
-        dc.SetPen(wx.Pen(self.ball.color, 1))
-        dc.SetBrush(wx.Brush(self.ball.color, 1))
+        dc.SetPen(wx.Pen(self.ball.color))
+        dc.SetBrush(wx.Brush(self.ball.color))
         dc.DrawCircle(self.ball.x, self.ball.y, self.ball.radius)
         # Paint Blovks
         for (i, b_list) in enumerate(self.blocks):
             for (j, b) in enumerate(b_list):
                 if self.block_exist[i][j] == 1:
                     dc.SetPen(wx.Pen(b.color,1))
-                    dc.SetBrush(wx.Brush(b.color, 1))
+                    dc.SetBrush(wx.Brush(b.color))
                     dc.DrawRectangle(b.x, b.y, b.size[0], b.size[1])
 
     def onKey(self, event):
@@ -101,9 +100,9 @@ class FieldPanel(wx.Panel):
             elif self.state == "END":
                 self.initialize()
                 self.state = gGameState[0]
-        elif keycode == wx.WXK_LEFT and self.state != "END":
+        elif (keycode == wx.WXK_LEFT or keycode == ord('H')) and self.state != "END":
             self.bar.move(-1)
-        elif keycode == wx.WXK_RIGHT and self.state != "END":
+        elif (keycode == wx.WXK_RIGHT or keycode == ord('L')) and self.state != "END":
             self.bar.move(1)
 
     def initialize(self):
