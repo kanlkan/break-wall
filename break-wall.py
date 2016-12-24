@@ -8,7 +8,7 @@ import wx
 import random
 import math
 
-gVersion = "0.1.0"
+gVersion = "0.8.0"
 gGameState = ("INIT","PLAYING","END")
 gTimerInterval = 5 # [msec]
 gFieldWidth = 640
