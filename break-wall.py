@@ -113,17 +113,6 @@ class FieldPanel(wx.Panel):
         self.ball.vec = [0, 0]
         self.block_exist = [[1 for i in range(gBlkVCnt)] for j in range(gBlkHCnt)]
 
-    def detStageClear(self):
-        no_block = 1
-        for exist_list in self.block_exist:
-            for exist in exist_list:
-                if exist == 1:
-                    no_block = 0
-
-        if no_block == 1:
-            # Game Clear -> "END"
-            self.state = gGameState[2]
-
 
 class Bar(object):
     def __init__(self, parent, x, y, size=gBarSize, color=gBarColor, speed=gBarSpeed):
