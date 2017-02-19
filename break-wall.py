@@ -55,14 +55,13 @@ class FieldPanel(wx.Panel):
         self.size = size
 
         self.SetBackgroundColour(gFieldColor)
-        self.SetBackgroundStyle(wx.BG_STYLE_PAINT)
+        #self.SetBackgroundStyle(wx.BG_STYLE_PAINT)
         
         self.bar = Bar(self, gBarIniPos[0], gBarIniPos[1])
         self.ball = Ball(self, gBarIniPos[0], (gBarIniPos[1] - gBallRadius))
         self.blocks = [[Block(i*gBlkSize[0], gBlkTop+j*gBlkSize[1], \
                               gBlkColor[(gBlkVCnt*j+i)%gBlkHCnt]) \
                         for i in range(gBlkVCnt)] for j in range(gBlkHCnt)]
-        self.block_exist = [[1 for i in range(gBlkVCnt)] for j in range(gBlkHCnt)]
         self.state = gGameState[0]
 
         self.Bind(wx.EVT_PAINT, self.onPaint)
@@ -83,10 +82,10 @@ class FieldPanel(wx.Panel):
         dc.SetPen(wx.Pen(self.ball.color))
         dc.SetBrush(wx.Brush(self.ball.color))
         dc.DrawCircle(self.ball.x, self.ball.y, self.ball.radius)
-        # Paint Blovks
-        for (i, b_list) in enumerate(self.blocks):
-            for (j, b) in enumerate(b_list):
-                if self.block_exist[i][j] == 1:
+        # Paint Blocks
+        for b_list in self.blocks:
+            for b in b_list:
+                if b.exist == 1:
                     dc.SetPen(wx.Pen(b.color,1))
                     dc.SetBrush(wx.Brush(b.color))
                     dc.DrawRectangle(b.x, b.y, b.size[0], b.size[1])
@@ -111,7 +110,9 @@ class FieldPanel(wx.Panel):
         self.ball.x = self.bar.x
         self.ball.y = self.bar.y - self.ball.radius
         self.ball.vec = [0, 0]
-        self.block_exist = [[1 for i in range(gBlkVCnt)] for j in range(gBlkHCnt)]
+        for b_list in self.blocks:
+            for b in b_list:
+                b.exist = 1
 
 
 class Bar(object):
@@ -147,11 +148,9 @@ class Ball(object):
         self.speed = speed
 
     def shoot(self):
-        self.parent.state = gGameState[1]
         rand_x = random.randrange(1000, 5000)
         rand_y = random.randrange(2000, 5000)
         self.vec = (-1.0 * float(rand_x)/1000.0, -1.0 * float(rand_y)/1000.0)
-        pass
 
     def move(self):
         if self.parent.state == "INIT":
@@ -200,22 +199,21 @@ class Ball(object):
 
         # Bound at Blocks
         no_block = 1
-        for (i, b_exist_list) in enumerate(self.parent.block_exist):
-            for (j, b_exist) in enumerate(b_exist_list):
-                if b_exist == 1:
+        for b_list in self.parent.blocks:
+            for b in b_list:
+                if b.exist == 1:
                     no_block = 0
-                    tgt_block = self.parent.blocks[i][j]
                     # Ball cross the block edge
-                    if self.x > (tgt_block.x - self.radius) and \
-                       self.x < (tgt_block.x + tgt_block.size[0] + self.radius) and \
-                       self.y > (tgt_block.y - self.radius) and \
-                       self.y < (tgt_block.y + tgt_block.size[1] + self.radius):
+                    if self.x > (b.x - self.radius) and \
+                       self.x < (b.x + b.size[0] + self.radius) and \
+                       self.y > (b.y - self.radius) and \
+                       self.y < (b.y + b.size[1] + self.radius):
 
-                        self.parent.block_exist[i][j] = 0
+                        b.exist = 0
                         # update vec
-                        x0 = tgt_block.x + tgt_block.size[0] / 2
-                        y0 = tgt_block.y + tgt_block.size[1] / 2
-                        k = float(tgt_block.size[1]) / float(tgt_block.size[0])
+                        x0 = b.x + b.size[0] / 2
+                        y0 = b.y + b.size[1] / 2
+                        k = float(b.size[1]) / float(b.size[0])
                         #### top
                         if (self.vec[1] > 0) and \
                            (self.x < x0 and \
@@ -252,6 +250,7 @@ class Block(object):
         self.y = y
         self.color = color
         self.size = size
+        self.exist = 1
 
 
 if __name__ == "__main__":
